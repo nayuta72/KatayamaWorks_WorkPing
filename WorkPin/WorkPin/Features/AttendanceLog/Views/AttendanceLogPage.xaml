@@ -1,0 +1,316 @@
+<Page
+    x:Class="WorkPin.Features.AttendanceLog.Views.AttendanceLogPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:WorkPin.Features.AttendanceLog.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Loaded="Page_Loaded"
+    mc:Ignorable="d">
+    <Page.Resources>
+        <SolidColorBrush x:Key="PastelGreenBrush" Color="#7FBF7F" />
+        <SolidColorBrush x:Key="PastelYellowBrush" Color="#ECD28F" />
+        <SolidColorBrush x:Key="PastelRedBrush" Color="#ED899D" />
+
+        <!--  出勤ステータスボタン共通スタイル  -->
+        <Style x:Key="StatusButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="50" />
+            <Setter Property="Height" Value="50" />
+            <Setter Property="CornerRadius" Value="40" />
+            <Setter Property="FontSize" Value="24" />
+            <Setter Property="Padding" Value="0" />
+        </Style>
+    </Page.Resources>
+
+    <ScrollViewer Padding="10">
+        <StackPanel MaxWidth="700">
+
+            <!--  =============================  -->
+            <!--  勤怠ボタン  -->
+            <!--  =============================  -->
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="110" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="70" />
+                </Grid.ColumnDefinitions>
+
+                <!--  =============================  -->
+                <!--  勤務形態トグルスイッチ  -->
+                <!--  =============================  -->
+                <Border
+                    Grid.RowSpan="2"
+                    Margin="2"
+                    Padding="10"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8">
+                    <ToggleSwitch
+                        Margin="0,-4,0,0"
+                        VerticalAlignment="Center"
+                        Header="在宅？"
+                        IsOn="{x:Bind ViewModel.IsRemoteWork.Value, Mode=TwoWay}">
+                        <!-- Off（出社）：ビルアイコン -->
+                        <ToggleSwitch.OffContent>
+                            <FontIcon Glyph="&#xE731;" FontSize="16" />
+                        </ToggleSwitch.OffContent>
+                        <!-- On（在宅）：ホームアイコン -->
+                        <ToggleSwitch.OnContent>
+                            <FontIcon Glyph="&#xE80F;" FontSize="16" />
+                        </ToggleSwitch.OnContent>
+                    </ToggleSwitch>
+
+
+                </Border>
+
+
+                <!--  =============================  -->
+                <!--  出勤ステータスボタン  -->
+                <!--  =============================  -->
+                <Border
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    Margin="2"
+                    Padding="10"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8">
+                    <StackPanel Spacing="12">
+
+                        <StackPanel
+                            HorizontalAlignment="Left"
+                            Orientation="Horizontal"
+                            Spacing="16">
+                            <StackPanel Width="200">
+                                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="出勤ステータス" />
+                                <TextBlock
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    Style="{StaticResource CaptionTextBlockStyle}"
+                                    Text="今日の朝の体調を選んでください" />
+                            </StackPanel>
+                            <!--  体調良好（笑顔）ボタン：選択中は緑  -->
+                            <Button
+                                x:Name="ClockInGoodButton"
+                                Background="{x:Bind GetClockInGoodColor(ViewModel.IsClockInGood.Value), Mode=OneWay}"
+                                BorderBrush="{StaticResource PastelGreenBrush}"
+                                Command="{x:Bind ViewModel.ClockInGoodCommand}"
+                                Style="{StaticResource StatusButtonStyle}"
+                                ToolTipService.ToolTip="体調良好">
+                                <TextBlock
+                                    FontSize="24"
+                                    Opacity="0.7"
+                                    Text="😊" />
+                            </Button>
+
+                            <!--  いつもどおり（真顔）ボタン：選択中は黄  -->
+                            <Button
+                                x:Name="ClockInNormalButton"
+                                Background="{x:Bind GetClockInNormalColor(ViewModel.IsClockInNormal.Value), Mode=OneWay}"
+                                BorderBrush="{StaticResource PastelYellowBrush}"
+                                Command="{x:Bind ViewModel.ClockInNormalCommand}"
+                                Style="{StaticResource StatusButtonStyle}"
+                                ToolTipService.ToolTip="いつもどおり">
+                                <TextBlock
+                                    FontSize="24"
+                                    Opacity="0.7"
+                                    Text="😐" />
+                            </Button>
+
+                            <!--  体調不良（辛そうな顔）ボタン：選択中は赤  -->
+                            <Button
+                                x:Name="ClockInBadButton"
+                                Background="{x:Bind GetClockInBadColor(ViewModel.IsClockInBad.Value), Mode=OneWay}"
+                                BorderBrush="{StaticResource PastelRedBrush}"
+                                Command="{x:Bind ViewModel.ClockInBadCommand}"
+                                Style="{StaticResource StatusButtonStyle}"
+                                ToolTipService.ToolTip="体調不良">
+                                <TextBlock
+                                    FontSize="24"
+                                    Opacity="0.7"
+                                    Text="😞" />
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!--  =============================  -->
+                <!--  退勤ステータスボタン  -->
+                <!--  =============================  -->
+                <Border
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Margin="2"
+                    Padding="10"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8">
+                    <StackPanel Spacing="12">
+
+                        <StackPanel
+                            HorizontalAlignment="Left"
+                            Orientation="Horizontal"
+                            Spacing="16">
+                            <StackPanel Width="200">
+                                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="退勤ステータス" />
+                                <TextBlock
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    Style="{StaticResource CaptionTextBlockStyle}"
+                                    Text="今日の仕事の達成状況を選んでください" />
+                            </StackPanel>
+                            <!--  順調（笑顔）ボタン：選択中は緑  -->
+                            <Button
+                                Background="{x:Bind GetClockOutGoodColor(ViewModel.IsClockOutGood.Value), Mode=OneWay}"
+                                BorderBrush="{StaticResource PastelGreenBrush}"
+                                Command="{x:Bind ViewModel.ClockOutGoodCommand}"
+                                Style="{StaticResource StatusButtonStyle}"
+                                ToolTipService.ToolTip="順調に完了">
+                                <TextBlock
+                                    FontSize="24"
+                                    Opacity="0.7"
+                                    Text="😊" />
+                            </Button>
+
+                            <!--  なんとか終わったボタン：選択中は黄  -->
+                            <Button
+                                Background="{x:Bind GetClockOutNormalColor(ViewModel.IsClockOutNormal.Value), Mode=OneWay}"
+                                BorderBrush="{StaticResource PastelYellowBrush}"
+                                Command="{x:Bind ViewModel.ClockOutNormalCommand}"
+                                Style="{StaticResource StatusButtonStyle}"
+                                ToolTipService.ToolTip="なんとか終わった...">
+                                <TextBlock
+                                    FontSize="24"
+                                    Opacity="0.7"
+                                    Text="😐" />
+                            </Button>
+
+                            <!--  ヤバいボタン：選択中は赤  -->
+                            <Button
+                                Background="{x:Bind GetClockOutBadColor(ViewModel.IsClockOutBad.Value), Mode=OneWay}"
+                                BorderBrush="{StaticResource PastelRedBrush}"
+                                Command="{x:Bind ViewModel.ClockOutBadCommand}"
+                                Style="{StaticResource StatusButtonStyle}"
+                                ToolTipService.ToolTip="ヤバい...終わらない!">
+                                <TextBlock
+                                    FontSize="24"
+                                    Opacity="0.7"
+                                    Text="😞" />
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!--  =============================  -->
+                <!--  コメント入力ボタン  -->
+                <!--  =============================  -->
+                <Border
+                    Grid.RowSpan="2"
+                    Grid.Column="2"
+                    Margin="2"
+                    Padding="10"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8">
+                    <Button
+                        HorizontalAlignment="Left"
+                        Background="Transparent"
+                        BorderBrush="Transparent"
+                        Command="{x:Bind ViewModel.OpenCommentDialogCommand}"
+                        ToolTipService.ToolTip="コメント送信">
+                        <FontIcon FontSize="16" Glyph="&#xE8BD;" />
+                    </Button>
+                </Border>
+
+            </Grid>
+
+            <!--  =============================  -->
+            <!--  就業管理システム・M-Plusへのジャンプボタン  -->
+            <!--  =============================  -->
+
+            <Border
+                Margin="2"
+                Padding="16"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8">
+                <StackPanel Orientation="Horizontal">
+                    <Button Margin="0,0,10,0" Content="就業管理システム" Click="WorktimeSystemButton_Click" />
+                    <Button Margin="0,0,10,0" Content="M-Plus" Click="MPlusButton_Click" />
+                    <Button Margin="0,0,10,0" Content="生産管理システム" Click="ProductionSystemButton_Click" />
+                </StackPanel>
+            </Border>
+            <!--  =============================  -->
+            <!--  Windows ログイン時刻情報  -->
+            <!--  =============================  -->
+            <Border
+                Margin="2"
+                Padding="16"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8">
+                <Grid ColumnSpacing="32">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!--  前回起動日のログイン情報  -->
+                    <StackPanel Grid.Column="0" Spacing="8">
+                        <TextBlock
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Style="{StaticResource CaptionTextBlockStyle}"
+                            Text="前回 ログイン" />
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon FontSize="14" Glyph="&#xE727;" />
+                            <TextBlock Text="{x:Bind ViewModel.YesterdayLoginTime.Value, Mode=OneWay}" />
+                        </StackPanel>
+                        <TextBlock
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Style="{StaticResource CaptionTextBlockStyle}"
+                            Text="前回 ログアウト" />
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon FontSize="14" Glyph="&#xE8FB;" />
+                            <TextBlock Text="{x:Bind ViewModel.YesterdayLogoutTime.Value, Mode=OneWay}" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!--  今日のログイン情報  -->
+                    <StackPanel Grid.Column="1" Spacing="8">
+                        <TextBlock
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Style="{StaticResource CaptionTextBlockStyle}"
+                            Text="今日のログイン" />
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon FontSize="14" Glyph="&#xE727;" />
+                            <TextBlock Text="{x:Bind ViewModel.TodayLoginTime.Value, Mode=OneWay}" />
+                        </StackPanel>
+                        <TextBlock
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Style="{StaticResource CaptionTextBlockStyle}"
+                            Text="現在時刻" />
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon FontSize="14" Glyph="&#xE916;" />
+                            <!--  CurrentTime は 1 秒ごとに更新される  -->
+                            <TextBlock Text="{x:Bind ViewModel.CurrentTime.Value, Mode=OneWay}" />
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+
+
+
+
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(\"C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/MSBuild.exe\" \"c:/Users/5to19/OneDrive/ドキュメント/ClaudeDev/KatayamaWorks_WorkPing/WorkPin/WorkPin/WorkPin.csproj\" -p:Platform=x64 -p:Configuration=Debug)",
+      "Bash(grep -E \"^.*error.*$\")",
+      "Bash(\"C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/MSBuild.exe\" \"c:/Users/5to19/OneDrive/ドキュメント/ClaudeDev/KatayamaWorks_WorkPing/WorkPin/WorkPin/WorkPin.csproj\" -p:Platform=x64 -p:Configuration=Debug -verbosity:minimal)",
+      "Bash(ls \"C:/Users/5to19/Desktop/\"WorkPin*)",
+      "Bash(\"C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/MSBuild.exe\" \"c:/Users/5to19/OneDrive/ドキュメント/ClaudeDev/KatayamaWorks_WorkPing/WorkPin/WorkPin/WorkPin.csproj\" -p:Platform=x64 -p:Configuration=Debug -t:Build -verbosity:minimal)",
+      "Bash(\"C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/MSBuild.exe\" \"c:/Users/5to19/OneDrive/ドキュメント/ClaudeDev/KatayamaWorks_WorkPing/WorkPin/WorkPin/WorkPin.csproj\" -p:Platform=x64 -p:Configuration=Debug -t:Restore -t:Build -verbosity:minimal)",
+      "Bash(taskkill /IM WorkPin.exe /F)",
+      "Bash(taskkill //IM WorkPin.exe //F)",
+      "Bash(\"C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/MSBuild.exe\" \"WorkPin/WorkPin/WorkPin.csproj\" -p:Platform=x64 -p:Configuration=Debug -t:Build -verbosity:minimal)",
+      "Bash(dotnet-script --version)",
+      "Read(//c/tmp/IconGen/**)",
+      "Bash(dotnet run:*)",
+      "Read(//c/Users/5to19/AppData/Local/**)",
+      "Read(//c/Users/5to19/AppData/Roaming/**)",
+      "Read(//c/Users/5to19/AppData/**)"
+    ],
+    "additionalDirectories": [
+      "c:\\tmp\\IconGen"
+    ]
+  }
+}

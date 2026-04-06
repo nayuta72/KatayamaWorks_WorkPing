@@ -1,0 +1,113 @@
+# ==============================================
+# WinUI 3 / .NET 10 プロジェクト用 .gitignore
+# ==============================================
+
+# ──────────────────────────────────────────
+# ビルド出力
+# ──────────────────────────────────────────
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+[Ll]og/
+[Ll]ogs/
+
+# ──────────────────────────────────────────
+# Visual Studio
+# ──────────────────────────────────────────
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+# Visual Studio テスト結果
+TestResults/
+*.trx
+
+# Visual Studio Profiler
+*.psess
+*.vsp
+*.vspx
+*.sap
+
+# ──────────────────────────────────────────
+# WinUI 3 / UWP / MSIX パッケージ
+# ──────────────────────────────────────────
+AppPackages/
+BundleArtifacts/
+Package.StoreAssociation.xml
+_pkginfo.txt
+*.appx
+*.appxbundle
+*.appxupload
+*.msix
+*.msixbundle
+*.msixupload
+
+# WinUI 3 生成ファイル
+Generated Files/
+_generated/
+
+# ──────────────────────────────────────────
+# .NET / NuGet
+# ──────────────────────────────────────────
+*.nupkg
+*.snupkg
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# NuGet キャッシュ（リポジトリには含めない）
+packages/
+!packages/build/
+
+# ──────────────────────────────────────────
+# JetBrains Rider / ReSharper
+# ──────────────────────────────────────────
+.idea/
+*.sln.iml
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# ──────────────────────────────────────────
+# OS 生成ファイル
+# ──────────────────────────────────────────
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# macOS（共同作業者がいる場合のため念のため記載）
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# ──────────────────────────────────────────
+# その他
+# ──────────────────────────────────────────
+# エディタ一時ファイル
+*.swp
+*.swo
+*~
+
+# Windows Image File
+*.cab
+*.msi
+*.msm
+*.msp
+
+# Node.js（フロントエンドツールを使う場合）
+node_modules/
+npm-debug.log*
+
+# 環境設定（シークレットを含む可能性があるため除外）
+.env
+.env.local
+.env.*.local
+
+# 自分用メモ
+メモ.txt
