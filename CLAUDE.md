@@ -1,4 +1,4 @@
-# Project: WorkPin (WinUI3 + .NET 10 + ReactiveProperty)
+# Project: WorkPing (WinUI3 + .NET 10 + ReactiveProperty)
 - 開発するアプリケーションはWindows 11の64bit OSでしか使わないので32bit版などのことは考慮する必要なし。
 
 ## 操作確認について
@@ -53,9 +53,9 @@
 - **コメントについて** コメントは、プロジェクトに後から入ってきた新人がすぐに理解できるように少し多めかつわかりやすく丁寧(親切)に記載する。
 
 ## 開発コマンド
-- **ビルド:** `"C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/MSBuild.exe" WorkPin/WorkPin/WorkPin.csproj -p:Platform=x64 -p:Configuration=Debug`
+- **ビルド:** `"C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/MSBuild.exe" WorkPing/WorkPing/WorkPing.csproj -p:Platform=x64 -p:Configuration=Debug`
   - `dotnet build` は WinUI3 では使用不可（PRI生成タスクがVSのDLLに依存するため）
-- **実行:** ビルド後 `WorkPin/WorkPin/bin/x64/Debug/net10.0-windows10.0.19041.0/WorkPin.exe` を直接実行
+- **実行:** ビルド後 `C:\tmp\WorkPing\bin\WorkPing\x64\Debug\net10.0-windows10.0.19041.0\WorkPing.exe` を直接実行（OneDrive管理外の C:\tmp\ に出力）
   - または Visual Studio 2022 / 2026 からデバッグ実行
 
 ## Git 運用ルール

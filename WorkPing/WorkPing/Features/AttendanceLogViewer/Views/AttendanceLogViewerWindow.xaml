@@ -1,0 +1,271 @@
+<Window
+    x:Class="WorkPing.Features.AttendanceLogViewer.Views.AttendanceLogViewerWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:WorkPing.Features.AttendanceLogViewer.Models"
+    Title="勤怠ログ一覧"
+    mc:Ignorable="d">
+
+    <Window.SystemBackdrop>
+        <DesktopAcrylicBackdrop />
+    </Window.SystemBackdrop>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <!--  カスタムタイトルバー領域（ドラッグ可能）  -->
+            <RowDefinition Height="48" />
+            <!--  フィルタボックス  -->
+            <RowDefinition Height="Auto" />
+            <!--  列ヘッダー  -->
+            <RowDefinition Height="Auto" />
+            <!--  ログ一覧  -->
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!--  =============================  -->
+        <!--  カスタムタイトルバー  -->
+        <!--  =============================  -->
+        <!--  このGridをドラッグ可能なタイトルバーとして SetTitleBar() に渡す  -->
+        <Grid
+            x:Name="ViewerTitleBar"
+            Grid.Row="0"
+            Background="Transparent">
+            <Grid.ColumnDefinitions>
+                <!--  日付範囲タイトル（左寄せ）  -->
+                <ColumnDefinition Width="*" />
+                <!--  再読み込みボタン  -->
+                <ColumnDefinition Width="Auto" />
+                <!--  ウィンドウボタン（閉じる等）の余白  -->
+                <ColumnDefinition Width="120" />
+            </Grid.ColumnDefinitions>
+
+            <!--  日付範囲タイトル  -->
+            <TextBlock
+                Grid.Column="0"
+                Margin="16,0,0,0"
+                VerticalAlignment="Center"
+                FontSize="14"
+                FontWeight="SemiBold"
+                Text="{x:Bind ViewModel.RangeTitle.Value, Mode=OneWay}" />
+
+            <!--  再読み込みボタン  -->
+            <Button
+                Grid.Column="1"
+                Margin="0,0,8,0"
+                VerticalAlignment="Center"
+                Click="RefreshButton_Click"
+                ToolTipService.ToolTip="ログファイルを再読み込みする">
+                <FontIcon FontSize="14" Glyph="&#xE72C;" />
+            </Button>
+        </Grid>
+
+        <!--  =============================  -->
+        <!--  フィルタボックス  -->
+        <!--  =============================  -->
+        <Grid
+            Grid.Row="1"
+            Padding="16,8"
+            ColumnSpacing="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <!--  名前フィルタ  -->
+            <StackPanel Grid.Column="0" Spacing="2">
+                <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="名前" />
+                <TextBox
+                    Width="120"
+                    PlaceholderText="名前で絞り込み"
+                    Text="{x:Bind ViewModel.NameFilter.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+
+            <!--  日付フィルタ  -->
+            <StackPanel Grid.Column="1" Spacing="2">
+                <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="日付" />
+                <TextBox
+                    Width="160"
+                    PlaceholderText="例: 2026/04"
+                    Text="{x:Bind ViewModel.DateFilter.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+
+            <!--  スペーサー  -->
+            <Grid Grid.Column="2" />
+
+            <!--  件数表示  -->
+            <TextBlock
+                Grid.Column="3"
+                Margin="0,0,0,6"
+                VerticalAlignment="Bottom"
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                Style="{StaticResource CaptionTextBlockStyle}"
+                Text="{x:Bind ViewModel.EntryCount.Value, Mode=OneWay}" />
+        </Grid>
+
+        <!--  =============================  -->
+        <!--  列ヘッダー  -->
+        <!--  =============================  -->
+        <Border
+            Grid.Row="2"
+            Margin="16,0,16,0"
+            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            BorderThickness="1"
+            CornerRadius="4">
+            <Grid Padding="8,6" ColumnSpacing="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="50" />
+                    <ColumnDefinition Width="60" />
+                    <ColumnDefinition Width="50" />
+                    <ColumnDefinition Width="60" />
+                    <ColumnDefinition Width="50" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock
+                    Grid.Column="0"
+                    FontWeight="SemiBold"
+                    Style="{StaticResource CaptionTextBlockStyle}"
+                    Text="日付" />
+                <TextBlock
+                    Grid.Column="1"
+                    FontWeight="SemiBold"
+                    Style="{StaticResource CaptionTextBlockStyle}"
+                    Text="氏名" />
+                <TextBlock
+                    Grid.Column="2"
+                    FontWeight="SemiBold"
+                    Style="{StaticResource CaptionTextBlockStyle}"
+                    Text="在宅？" />
+                <TextBlock
+                    Grid.Column="3"
+                    FontWeight="SemiBold"
+                    Style="{StaticResource CaptionTextBlockStyle}"
+                    Text="開始" />
+                <TextBlock
+                    Grid.Column="4"
+                    FontWeight="SemiBold"
+                    Style="{StaticResource CaptionTextBlockStyle}"
+                    Text="体調" />
+                <TextBlock
+                    Grid.Column="5"
+                    FontWeight="SemiBold"
+                    Style="{StaticResource CaptionTextBlockStyle}"
+                    Text="終了" />
+                <TextBlock
+                    Grid.Column="6"
+                    FontWeight="SemiBold"
+                    Style="{StaticResource CaptionTextBlockStyle}"
+                    Text="達成状況" />
+                <TextBlock
+                    Grid.Column="7"
+                    FontWeight="SemiBold"
+                    Style="{StaticResource CaptionTextBlockStyle}"
+                    Text="コメント" />
+            </Grid>
+        </Border>
+
+        <!--  =============================  -->
+        <!--  ログ一覧 ListView  -->
+        <!--  =============================  -->
+        <ListView
+            x:Name="LogListView"
+            Grid.Row="3"
+            Margin="16,4,16,16"
+            IsItemClickEnabled="False"
+            ItemsSource="{x:Bind ViewModel.FilteredEntries}"
+            SelectionMode="None">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="Padding" Value="8,4" />
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="models:AttendanceLogEntry">
+                    <Grid ColumnSpacing="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="50" />
+                            <ColumnDefinition Width="60" />
+                            <ColumnDefinition Width="50" />
+                            <ColumnDefinition Width="60" />
+                            <ColumnDefinition Width="50" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Grid.Column="0"
+                            VerticalAlignment="Center"
+                            Text="{x:Bind DateDisplay}"
+                            TextTrimming="CharacterEllipsis" />
+                        <TextBlock
+                            Grid.Column="1"
+                            VerticalAlignment="Center"
+                            Text="{x:Bind Name}"
+                            TextTrimming="CharacterEllipsis" />
+                        <!--  在宅？列：在宅のときのみ HOME アイコンを表示、出社のときは空欄  -->
+                        <FontIcon
+                            Grid.Column="2"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontSize="16"
+                            Glyph="&#xE80F;"
+                            Visibility="{x:Bind RemoteIconVisibility}" />
+                        <TextBlock
+                            Grid.Column="3"
+                            VerticalAlignment="Center"
+                            Text="{x:Bind ClockIn}"
+                            TextTrimming="CharacterEllipsis" />
+
+                        <!--  体調列：ステータスに合わせた背景色の丸角Borderの中に顔絵文字を表示  -->
+                        <Border
+                            Grid.Column="4"
+                            Padding="6,2"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Background="{x:Bind ClockInStatusBackground}"
+                            CornerRadius="12">
+                            <TextBlock
+                                FontSize="15"
+                                Text="{x:Bind ClockInStatusEmoji}"
+                                TextAlignment="Center" />
+                        </Border>
+
+                        <TextBlock
+                            Grid.Column="5"
+                            VerticalAlignment="Center"
+                            Text="{x:Bind ClockOut}"
+                            TextTrimming="CharacterEllipsis" />
+
+                        <!--  負荷列：ステータスに合わせた背景色の丸角Borderの中に顔絵文字を表示  -->
+                        <Border
+                            Grid.Column="6"
+                            Padding="6,2"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Background="{x:Bind ClockOutStatusBackground}"
+                            CornerRadius="12">
+                            <TextBlock
+                                FontSize="15"
+                                Text="{x:Bind ClockOutStatusEmoji}"
+                                TextAlignment="Center" />
+                        </Border>
+
+                        <TextBlock
+                            Grid.Column="7"
+                            VerticalAlignment="Center"
+                            Text="{x:Bind Comment}"
+                            TextTrimming="CharacterEllipsis" />
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+    </Grid>
+</Window>

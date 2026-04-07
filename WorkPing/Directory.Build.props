@@ -1,0 +1,14 @@
+<!-- Directory.Build.props
+     このファイルは MSBuild が各プロジェクトをロードする前に自動的に読み込まれます。
+     BaseIntermediateOutputPath / BaseOutputPath は Microsoft.Common.props より
+     先に設定しないと反映されないため、ここで一括設定します。
+     OneDrive の同期対象外となるローカルフォルダ (C:\tmp\WorkPing\) に
+     ビルド成果物を出力することで、OneDrive との競合を防ぎます。 -->
+<Project>
+  <PropertyGroup>
+    <!-- 中間ファイル (obj) の出力先 -->
+    <BaseIntermediateOutputPath>C:\tmp\WorkPing\obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+    <!-- 最終バイナリ (bin) の出力先 -->
+    <BaseOutputPath>C:\tmp\WorkPing\bin\$(MSBuildProjectName)\</BaseOutputPath>
+  </PropertyGroup>
+</Project>
