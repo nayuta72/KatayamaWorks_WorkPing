@@ -201,7 +201,6 @@ public class AccessCheckService : IDisposable
         var state = settings.InternalState;
 
         if (string.IsNullOrEmpty(state.LastLogDate)
-            || string.IsNullOrEmpty(settings.UserId)
             || string.IsNullOrEmpty(settings.FullName))
         {
             Debug.WriteLine("[AccessCheckService] 必須項目が不足しているため保留エントリーを復元できませんでした。");

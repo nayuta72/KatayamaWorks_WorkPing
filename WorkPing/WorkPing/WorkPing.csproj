@@ -24,7 +24,17 @@
     <AssemblyName>WorkPing</AssemblyName>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
+    <!-- exe ファイル自体に埋め込むアイコン（エクスプローラーで表示されるアイコン） -->
+    <ApplicationIcon>Assets\kintai.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <!-- アイコンファイルをビルド出力にコピーする
+         AppWindow.SetIcon() はランタイムに exe と同じフォルダの相対パスで参照するため必要 -->
+    <Content Include="Assets\kintai.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 
   <ItemGroup>
     <!-- Windows App SDK（WinUI 3 本体） -->

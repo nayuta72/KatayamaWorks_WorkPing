@@ -150,11 +150,37 @@ public class WindowsLoginService
                     using (rec) firstBootTime = rec.TimeCreated?.ToLocalTime();
             }
 
+            // ─── Step3.5 ────────────────────────────────────────────────────────
+            // 前回起動日の「最後の 起動（6005）」を取得する
+            // 途中で再起動した場合、再起動による 1074 を最終ログアウトと誤認しないよう、
+            // Step4/5 のシャットダウン検索をこの時刻以降に絞り込む。
+            //
+            // 例）23:34 に再起動要求（1074）→ 23:35 に起動（6005）の場合、
+            //     最後の 6005 = 23:35 なので、シャットダウン検索は 23:35 以降に限定される。
+            //     その結果、23:34 の 1074 は除外され、ログアウト時刻として誤表示されない。
+            var lastBootOfDayQuery = new EventLogQuery("System", PathType.LogName,
+                $"*[System[(EventID=6005) and TimeCreated[@SystemTime >= '{dayStartUtc}' and @SystemTime < '{dayEndUtc}']]]")
+            {
+                ReverseDirection = true    // 降順（新しい順）で先頭1件 = 最後の起動
+            };
+
+            DateTime? lastBootOfDayTime = null;
+            using (var reader = new EventLogReader(lastBootOfDayQuery))
+            {
+                var rec = reader.ReadEvent();
+                if (rec != null)
+                    using (rec) lastBootOfDayTime = rec.TimeCreated?.ToLocalTime();
+            }
+
+            // シャットダウン検索の開始時刻：最後の起動時刻（取得できなければ当日 00:00）
+            var afterLastBootUtc = (lastBootOfDayTime ?? prevBootDay)
+                .ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ");
+
             // ─── Step4 ──────────────────────────────────────────────────────────
-            // 前回起動日の「最後の シャットダウン（6006）」を取得する
-            // ReverseDirection = true（降順）で先頭1件 = その日の最後のシャットダウン
+            // 「最後の起動以降」の シャットダウン（6006）を取得する
+            // これにより再起動中の 1074 をログアウト時刻と誤認するのを防ぐ
             var lastShutdownQuery = new EventLogQuery("System", PathType.LogName,
-                $"*[System[(EventID=6006) and TimeCreated[@SystemTime >= '{dayStartUtc}' and @SystemTime < '{dayEndUtc}']]]")
+                $"*[System[(EventID=6006) and TimeCreated[@SystemTime >= '{afterLastBootUtc}' and @SystemTime < '{dayEndUtc}']]]")
             {
                 ReverseDirection = true    // 降順（新しい順）
             };
@@ -170,13 +196,14 @@ public class WindowsLoginService
             // ─── Step5 ──────────────────────────────────────────────────────────
             // 6006 が取得できなかった場合、Event 1074 でフォールバックする
             // 1074 = ユーザー操作やプロセスによるシャットダウン/再起動要求
-            // Windows 11 の高速スタートアップ有効環境では 6006 が記録されないことがあるため
+            // Windows 11 の高速スタートアップ有効環境では 6006 が記録されないことがあるため。
+            // こちらも「最後の起動以降」に絞り込む（再起動の 1074 を除外するため）。
             if (!lastShutdownTime.HasValue)
             {
                 Debug.WriteLine("[WindowsLoginService] 6006 なし → 1074 でフォールバック");
 
                 var fallbackShutdownQuery = new EventLogQuery("System", PathType.LogName,
-                    $"*[System[(EventID=1074) and TimeCreated[@SystemTime >= '{dayStartUtc}' and @SystemTime < '{dayEndUtc}']]]")
+                    $"*[System[(EventID=1074) and TimeCreated[@SystemTime >= '{afterLastBootUtc}' and @SystemTime < '{dayEndUtc}']]]")
                 {
                     ReverseDirection = true
                 };

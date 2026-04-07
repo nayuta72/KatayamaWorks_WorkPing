@@ -30,26 +30,79 @@ public sealed partial class AccountSettingsPage : Page
     }
 
     // ===========================
-    // 設定フォルダを開くボタン
+    // 設定ファイルを開くボタン
     // ===========================
 
     /// <summary>
-    /// settings.json が格納されているフォルダ（%AppData%\Roaming\kikakutools\WorkPing）を
-    /// エクスプローラーで開く。フォルダが存在しない場合は何もしない。
+    /// settings.json を OS の既定アプリ（メモ帳など）で直接開く。
+    /// ファイルが存在しない場合は何もしない。
     /// </summary>
-    private void OpenSettingsFolder_Click(object sender, RoutedEventArgs e)
+    private void OpenSettingsFile_Click(object sender, RoutedEventArgs e)
     {
         // SettingsService と同じパス計算ロジック
-        var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        var folderPath = Path.Combine(appData, "kikakutools", "WorkPing");
+        var appData    = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        var filePath   = Path.Combine(appData, "kikakutools", "WorkPing", "settings.json");
 
-        if (!Directory.Exists(folderPath)) return;
+        if (!File.Exists(filePath)) return;
 
-        // explorer.exe でフォルダを開く
-        Process.Start(new ProcessStartInfo("explorer.exe", $"\"{folderPath}\"")
+        // UseShellExecute = true で既定アプリに開かせる（メモ帳など）
+        Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
+    }
+
+    // ===========================
+    // スタートアップ登録ボタン
+    // ===========================
+
+    /// <summary>
+    /// このツールの exe ショートカット (.lnk) を Windows のスタートアップフォルダに作成する。
+    /// WScript.Shell COM オブジェクトを使用して .lnk を生成するため、
+    /// 管理者権限は不要（ユーザースタートアップフォルダへの書き込み）。
+    /// 既に登録済みの場合は上書きして最新の exe パスに更新する。
+    /// </summary>
+    private async void RegisterStartup_Click(object sender, RoutedEventArgs e)
+    {
+        try
         {
-            UseShellExecute = true
-        });
+            var exePath = Environment.ProcessPath;
+            if (string.IsNullOrEmpty(exePath))
+                throw new InvalidOperationException("実行ファイルのパスを取得できませんでした。");
+
+            // ユーザーのスタートアップフォルダ
+            // 例: %APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup
+            var startupFolder = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
+            var linkPath      = Path.Combine(startupFolder, "WorkPing.lnk");
+
+            // WScript.Shell COM オブジェクトでショートカットを作成する
+            // .NET 標準ライブラリに lnk 生成 API がないため COM を使用する
+            var shellType = Type.GetTypeFromProgID("WScript.Shell")
+                            ?? throw new InvalidOperationException("WScript.Shell の取得に失敗しました。");
+            dynamic shell    = Activator.CreateInstance(shellType)!;
+            dynamic shortcut = shell.CreateShortcut(linkPath);
+            shortcut.TargetPath      = exePath;
+            shortcut.WorkingDirectory = Path.GetDirectoryName(exePath) ?? string.Empty;
+            shortcut.Description     = "WorkPing - 出退勤ツール";
+            shortcut.Save();
+
+            var dialog = new ContentDialog
+            {
+                Title           = "スタートアップ登録完了",
+                Content         = $"WorkPing をスタートアップに登録しました。\n次回 Windows ログイン時から自動起動します。\n\n登録先：{linkPath}",
+                CloseButtonText = "OK",
+                XamlRoot        = XamlRoot
+            };
+            await dialog.ShowAsync();
+        }
+        catch (Exception ex)
+        {
+            var errorDialog = new ContentDialog
+            {
+                Title           = "スタートアップ登録エラー",
+                Content         = $"スタートアップへの登録に失敗しました。\n{ex.Message}",
+                CloseButtonText = "閉じる",
+                XamlRoot        = XamlRoot
+            };
+            await errorDialog.ShowAsync();
+        }
     }
 
     // ===========================

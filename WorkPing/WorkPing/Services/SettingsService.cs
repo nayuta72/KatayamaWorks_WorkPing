@@ -74,6 +74,15 @@ public class SettingsService
     }
 
     /// <summary>
+    /// Settings の購読者（FileWatcherService など）に変更を即時通知する。
+    /// Settings.Value オブジェクト内部のプロパティを書き換えても ReactivePropertySlim は
+    /// 自動では発火しないため、アカウント設定の保存後にこのメソッドを呼んで明示的に通知する。
+    /// ※ 出退勤ログ保存など頻繁に呼ばれる SaveSettingsAsync には含めず、
+    ///    設定変更が必要なタイミングだけ呼ぶこと。
+    /// </summary>
+    public void NotifySettingsChanged() => Settings.ForceNotify();
+
+    /// <summary>
     /// 現在の設定を非同期でファイルに保存する。
     /// </summary>
     /// <exception cref="Exception">ファイル書き込みに失敗した場合にスローされる。</exception>
@@ -125,7 +134,6 @@ public class SettingsService
         var s = Settings.Value;
         return !string.IsNullOrWhiteSpace(s.LastName)
             && !string.IsNullOrWhiteSpace(s.FirstName)
-            && !string.IsNullOrWhiteSpace(s.UserId)
             && s.LogFilePaths.Count > 0
             && s.LogFilePaths.Any(p => !string.IsNullOrWhiteSpace(p.FilePath));
     }

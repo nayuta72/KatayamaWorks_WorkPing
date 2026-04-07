@@ -21,9 +21,6 @@ public partial class AccountSettingsViewModel
     /// <summary>名の入力値</summary>
     public ReactivePropertySlim<string> FirstName { get; private set; } = null!;
 
-    /// <summary>ユーザーID の入力値</summary>
-    public ReactivePropertySlim<string> UserId { get; private set; } = null!;
-
     /// <summary>部署名の入力値</summary>
     public ReactivePropertySlim<string> DepartmentName { get; private set; } = null!;
 
@@ -57,7 +54,6 @@ public partial class AccountSettingsViewModel
     {
         LastName             = new ReactivePropertySlim<string>(string.Empty).AddTo(Disposable);
         FirstName            = new ReactivePropertySlim<string>(string.Empty).AddTo(Disposable);
-        UserId               = new ReactivePropertySlim<string>(string.Empty).AddTo(Disposable);
         DepartmentName       = new ReactivePropertySlim<string>(string.Empty).AddTo(Disposable);
         IsAdmin              = new ReactivePropertySlim<bool>(false).AddTo(Disposable);
         DefaultLogFileIndex  = new ReactivePropertySlim<int>(0).AddTo(Disposable);

@@ -52,7 +52,6 @@ public partial class AccountSettingsViewModel
 
             settings.LastName       = LastName.Value.Trim();
             settings.FirstName      = FirstName.Value.Trim();
-            settings.UserId         = UserId.Value.Trim();
             settings.DepartmentName = DepartmentName.Value.Trim();
             settings.IsAdmin        = IsAdmin.Value;
 
@@ -68,6 +67,10 @@ public partial class AccountSettingsViewModel
 
             // settings.json に書き込む
             await _settingsService.SaveSettingsAsync();
+
+            // FileWatcherService など Settings を購読しているサービスに変更を通知する。
+            // IsAdmin の変更をリアルタイムで反映させるために必要（再起動不要にするため）。
+            _settingsService.NotifySettingsChanged();
 
             System.Diagnostics.Debug.WriteLine("[AccountSettingsViewModel] 設定を保存しました。");
         }

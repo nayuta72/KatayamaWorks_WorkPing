@@ -143,7 +143,8 @@ public partial class AttendanceLogViewModel : IDisposable
 
                 _notificationService.ShowNotification(
                     "WorkPing",
-                    "出勤ステータスが未入力です。ボタンを押してください。");
+                    "出勤ステータスが未入力です。ボタンを押してください。",
+                    StatusIconService.ReminderKey);
             })
             .AddTo(Disposable);
     }

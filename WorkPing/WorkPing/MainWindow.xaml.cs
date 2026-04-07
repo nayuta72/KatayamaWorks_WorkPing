@@ -84,6 +84,9 @@ public sealed partial class MainWindow : Window
             SubscribeAccessStatus();
             App.Trace("SubscribeAccessStatus OK");
 
+            SubscribeSettingsChanges();
+            App.Trace("SubscribeSettingsChanges OK");
+
             SubscribeFileWatcher();
             App.Trace("SubscribeFileWatcher OK");
 
@@ -108,11 +111,16 @@ public sealed partial class MainWindow : Window
     /// <summary>
     /// カスタムタイトルバーを設定する。
     /// ExtendsContentIntoTitleBar = true にして、AppTitleBar グリッドをドラッグ領域として登録する。
+    /// また、タスクバー・Alt+Tab・タイトルバー左上に表示するウィンドウアイコンを設定する。
     /// </summary>
     private void InitializeTitleBar()
     {
         ExtendsContentIntoTitleBar = true;
         SetTitleBar(AppTitleBar);
+
+        // ウィンドウアイコンを設定する（タスクバー・Alt+Tab・タイトルバー左上）
+        // パスは exe と同じフォルダからの相対パスで指定する
+        GetAppWindow().SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets", "kintai.ico"));
     }
 
     // ===========================
@@ -271,6 +279,27 @@ public sealed partial class MainWindow : Window
                 AccessWarningPanel.Visibility = isAccessible
                     ? Visibility.Collapsed
                     : Visibility.Visible;
+            });
+        });
+    }
+
+    // ===========================
+    // 設定変更の購読（管理者フラグ切り替えの即時反映）
+    // ===========================
+
+    /// <summary>
+    /// アカウント設定の保存完了時に NotifySettingsChanged() が呼ばれると発火する。
+    /// IsAdmin の変更を再起動なしで即時反映するため、
+    /// ログ一覧ボタンの表示状態をここで更新する。
+    /// </summary>
+    private void SubscribeSettingsChanges()
+    {
+        _settingsService.Settings.Subscribe(_ =>
+        {
+            // Subscribe は別スレッドから呼ばれる可能性があるため UI スレッドに戻す
+            DispatcherQueue.TryEnqueue(() =>
+            {
+                InitializeLogFileComboBox();
             });
         });
     }

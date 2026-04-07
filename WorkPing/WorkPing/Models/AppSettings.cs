@@ -19,9 +19,6 @@ public class AppSettings
     /// <summary>名（例：太郎）</summary>
     public string FirstName { get; set; } = string.Empty;
 
-    /// <summary>ユーザーID（ログのエレメント名に使用する）</summary>
-    public string UserId { get; set; } = string.Empty;
-
     /// <summary>部署名</summary>
     public string DepartmentName { get; set; } = string.Empty;
 

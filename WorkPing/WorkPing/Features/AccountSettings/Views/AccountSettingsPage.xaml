@@ -16,10 +16,9 @@
             <TextBlock Text="ユーザー情報"
                        Style="{StaticResource SubtitleTextBlockStyle}" />
 
-            <!-- 部署名・姓・名・ユーザーID（横並び） -->
+            <!-- 部署名・姓・名（横並び） -->
             <Grid ColumnSpacing="8">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
@@ -28,9 +27,9 @@
                 <StackPanel Grid.Column="0" Spacing="4">
                     <TextBlock Text="部署名" Style="{StaticResource CaptionTextBlockStyle}" />
                     <TextBox Text="{x:Bind ViewModel.DepartmentName.Value, Mode=TwoWay}"
-              PlaceholderText="例：企画部" />
+                             PlaceholderText="例：企画部" />
                 </StackPanel>
-                
+
                 <StackPanel Grid.Column="1" Spacing="4">
                     <TextBlock Text="姓" Style="{StaticResource CaptionTextBlockStyle}" />
                     <TextBox Text="{x:Bind ViewModel.LastName.Value, Mode=TwoWay}"
@@ -42,19 +41,13 @@
                     <TextBox Text="{x:Bind ViewModel.FirstName.Value, Mode=TwoWay}"
                              PlaceholderText="例：太郎" />
                 </StackPanel>
-
-                <StackPanel Grid.Column="3" Spacing="4">
-                    <TextBlock Text="情報システムID" Style="{StaticResource CaptionTextBlockStyle}" />
-                    <TextBox Text="{x:Bind ViewModel.UserId.Value, Mode=TwoWay}"
-                             PlaceholderText="例：U001" />
-                </StackPanel>
             </Grid>
 
            
        
 
             <!-- 管理者チェックボックス -->
-            <CheckBox Content="管理者として使用する（ファイル変更通知を受け取る&amp;ログ一覧表示）※再起動必須"
+            <CheckBox Content="管理者として使用する（ファイル変更通知を受け取る・ログ一覧表示）"
                       IsChecked="{x:Bind ViewModel.IsAdmin.Value, Mode=TwoWay}" />
 
             <!-- ============================= -->
@@ -158,7 +151,7 @@
             </StackPanel>
 
             <!-- ============================= -->
-            <!-- 保存ボタン / フォルダを開くボタン -->
+            <!-- 保存ボタン / 設定ファイルを開く / スタートアップ登録 -->
             <!-- ============================= -->
             <StackPanel Orientation="Horizontal" Spacing="8">
 
@@ -171,12 +164,21 @@
                     </StackPanel>
                 </Button>
 
-                <!-- settings.json の格納フォルダをエクスプローラーで開く -->
-                <Button Click="OpenSettingsFolder_Click"
-                        ToolTipService.ToolTip="settings.json の保存フォルダをエクスプローラーで開く">
+                <!-- settings.json をテキストエディタで直接開く -->
+                <Button Click="OpenSettingsFile_Click"
+                        ToolTipService.ToolTip="settings.json をテキストエディタで開く">
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <FontIcon Glyph="&#xE8DA;" FontSize="14" />
-                        <TextBlock Text="設定フォルダを開く" />
+                        <FontIcon Glyph="&#xE8A5;" FontSize="14" />
+                        <TextBlock Text="設定ファイルを開く" />
+                    </StackPanel>
+                </Button>
+
+                <!-- Windows スタートアップへ登録 -->
+                <Button Click="RegisterStartup_Click"
+                        ToolTipService.ToolTip="スタートアップフォルダに WorkPing のショートカットを作成し、ログイン時に自動起動させる">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xE7E8;" FontSize="14" />
+                        <TextBlock Text="スタートアップに登録" />
                     </StackPanel>
                 </Button>
 

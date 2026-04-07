@@ -49,7 +49,6 @@ public partial class AccountSettingsViewModel : IDisposable
 
         LastName.Value       = s.LastName;
         FirstName.Value      = s.FirstName;
-        UserId.Value         = s.UserId;
         DepartmentName.Value = s.DepartmentName;
         IsAdmin.Value        = s.IsAdmin;
 
