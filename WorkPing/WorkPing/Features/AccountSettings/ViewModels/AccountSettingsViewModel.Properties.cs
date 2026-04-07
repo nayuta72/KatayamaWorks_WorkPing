@@ -37,8 +37,8 @@ public partial class AccountSettingsViewModel
     /// </summary>
     public List<LogFilePathViewModel> LogFilePaths { get; private set; } = null!;
 
-    /// <summary>デフォルトで使用するログファイルのインデックス（0〜2）</summary>
-    public ReactivePropertySlim<int> DefaultLogFileIndex { get; private set; } = null!;
+    /// <summary>メインのログファイルのインデックス（0〜2）。自分のログの書き込み先。</summary>
+    public ReactivePropertySlim<int> MainLogFileIndex { get; private set; } = null!;
 
     // ===========================
     // 状態プロパティ
@@ -56,7 +56,7 @@ public partial class AccountSettingsViewModel
         FirstName            = new ReactivePropertySlim<string>(string.Empty).AddTo(Disposable);
         DepartmentName       = new ReactivePropertySlim<string>(string.Empty).AddTo(Disposable);
         IsAdmin              = new ReactivePropertySlim<bool>(false).AddTo(Disposable);
-        DefaultLogFileIndex  = new ReactivePropertySlim<int>(0).AddTo(Disposable);
+        MainLogFileIndex     = new ReactivePropertySlim<int>(0).AddTo(Disposable);
         IsSaving             = new ReactivePropertySlim<bool>(false).AddTo(Disposable);
 
         // ログファイルパス ViewModel を 3 件初期化する

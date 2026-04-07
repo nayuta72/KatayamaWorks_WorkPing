@@ -16,6 +16,22 @@ public class AttendanceLogEntry
     /// <summary>表示用日付文字列（yyyy/MM/dd 形式）</summary>
     public string DateDisplay => Date.ToString("yyyy/MM/dd");
 
+    /// <summary>
+    /// 曜日表示文字列。Date プロパティから算出する。
+    /// 表示形式: (日) / (月) / (火) / (水) / (木) / (金) / (土)
+    /// </summary>
+    public string DayOfWeekDisplay => Date.DayOfWeek switch
+    {
+        DayOfWeek.Sunday    => "(日)",
+        DayOfWeek.Monday    => "(月)",
+        DayOfWeek.Tuesday   => "(火)",
+        DayOfWeek.Wednesday => "(水)",
+        DayOfWeek.Thursday  => "(木)",
+        DayOfWeek.Friday    => "(金)",
+        DayOfWeek.Saturday  => "(土)",
+        _                   => string.Empty
+    };
+
     /// <summary>氏名</summary>
     public string Name { get; set; } = string.Empty;
 

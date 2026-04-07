@@ -64,11 +64,14 @@ public class AppSettings
     [JsonIgnore]
     public string FullName => $"{LastName} {FirstName}".Trim();
 
-    /// <summary>現在有効なログファイルパス情報を返す。JSONには保存しない。</summary>
+    /// <summary>
+    /// メインのログファイルパス情報を返す。JSONには保存しない。
+    /// 自分の出退勤ログの書き込み先。アカウント設定の「メイン」で指定したファイル。
+    /// </summary>
     [JsonIgnore]
     public LogFilePath? CurrentLogFilePath =>
-        LogFilePaths.Count > InternalState.DefaultLogFileIndex
-            ? LogFilePaths[InternalState.DefaultLogFileIndex]
+        LogFilePaths.Count > InternalState.MainLogFileIndex
+            ? LogFilePaths[InternalState.MainLogFileIndex]
             : LogFilePaths.Count > 0
                 ? LogFilePaths[0]
                 : null;

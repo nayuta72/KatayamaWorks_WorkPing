@@ -14,22 +14,22 @@ public partial class AttendanceLogViewModel
     // コマンド定義
     // ===========================
 
-    /// <summary>出勤：体調良好ボタン（笑顔）</summary>
+    /// <summary>出勤：体調、特に問題なしボタン（笑顔）</summary>
     public ReactiveCommandSlim ClockInGoodCommand { get; private set; } = null!;
 
-    /// <summary>出勤：いつもどおりボタン（真顔）</summary>
+    /// <summary>出勤：体調、少しだけよくないボタン（真顔）</summary>
     public ReactiveCommandSlim ClockInNormalCommand { get; private set; } = null!;
 
-    /// <summary>出勤：体調不良ボタン（辛そうな顔）</summary>
+    /// <summary>出勤：体調、しんどいボタン（辛そうな顔）</summary>
     public ReactiveCommandSlim ClockInBadCommand { get; private set; } = null!;
 
-    /// <summary>退勤：順調ボタン（笑顔）</summary>
+    /// <summary>退勤：順調に完了ボタン（笑顔）</summary>
     public ReactiveCommandSlim ClockOutGoodCommand { get; private set; } = null!;
 
-    /// <summary>退勤：計画どおりボタン（真顔）</summary>
+    /// <summary>退勤：なんとか終わったボタン（真顔）</summary>
     public ReactiveCommandSlim ClockOutNormalCommand { get; private set; } = null!;
 
-    /// <summary>退勤：負荷高ボタン（辛そうな顔）</summary>
+    /// <summary>退勤：ヤバい終わらないボタン（辛そうな顔）</summary>
     public ReactiveCommandSlim ClockOutBadCommand { get; private set; } = null!;
 
     /// <summary>コメント入力ダイアログを開くコマンド</summary>

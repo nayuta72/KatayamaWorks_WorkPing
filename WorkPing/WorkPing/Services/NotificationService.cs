@@ -18,8 +18,8 @@ namespace WorkPing.Services;
 ///   レジストリ登録する必要がある（管理者権限不要・アプリ起動時に自動登録）。
 ///
 /// 通知アイコン：
-///   StatusIconService で生成した色付き丸アイコン PNG を
-///   appLogoOverride + hint-crop="circle" で表示する。
+///   StatusIconService で生成した色付き角丸四角アイコン PNG を
+///   appLogoOverride で表示する（PNG 自体が角丸四角のため hint-crop は不要）。
 ///   ステータスが不明の場合はアイコンなしで通知する。
 /// </summary>
 public class NotificationService
@@ -117,9 +117,10 @@ public class NotificationService
         var escapedTitle   = EscapeXml(title);
         var escapedMessage = EscapeXml(message);
 
-        // アイコンがある場合: appLogoOverride で丸クロップアイコンを表示する
+        // アイコンがある場合: appLogoOverride でアイコンを表示する（hint-crop は指定しない）
+        // PNG 自体が角丸四角に描画されているため、Windows 側のクロップは不要
         var logoElement = iconUri != null
-            ? $"""<image placement="appLogoOverride" hint-crop="circle" src="{EscapeXml(iconUri)}" />"""
+            ? $"""<image placement="appLogoOverride" src="{EscapeXml(iconUri)}" />"""
             : string.Empty;
 
         return $"""

@@ -118,7 +118,8 @@
             CornerRadius="4">
             <Grid Padding="8,6" ColumnSpacing="0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="80" />
+                    <ColumnDefinition Width="40" />
                     <ColumnDefinition Width="100" />
                     <ColumnDefinition Width="50" />
                     <ColumnDefinition Width="60" />
@@ -129,44 +130,102 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock
                     Grid.Column="0"
+                    HorizontalAlignment="Stretch"
                     FontWeight="SemiBold"
                     Style="{StaticResource CaptionTextBlockStyle}"
-                    Text="日付" />
+                    Text="日付"
+                    TextAlignment="Center" />
                 <TextBlock
                     Grid.Column="1"
+                    HorizontalAlignment="Stretch"
                     FontWeight="SemiBold"
                     Style="{StaticResource CaptionTextBlockStyle}"
-                    Text="氏名" />
+                    Text="曜日"
+                    TextAlignment="Center" />
+                <!--  縦区切り線：曜日|氏名  -->
+                <Rectangle
+                    Grid.Column="1"
+                    Width="1"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Stretch"
+                    Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
                 <TextBlock
                     Grid.Column="2"
+                    HorizontalAlignment="Stretch"
                     FontWeight="SemiBold"
                     Style="{StaticResource CaptionTextBlockStyle}"
-                    Text="在宅？" />
+                    Text="氏名"
+                    TextAlignment="Center" />
+                <!--  縦区切り線：氏名|在宅  -->
+                <Rectangle
+                    Grid.Column="2"
+                    Width="1"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Stretch"
+                    Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
                 <TextBlock
                     Grid.Column="3"
+                    HorizontalAlignment="Stretch"
                     FontWeight="SemiBold"
                     Style="{StaticResource CaptionTextBlockStyle}"
-                    Text="開始" />
+                    Text="在宅？"
+                    TextAlignment="Center" />
+                <!--  縦区切り線：在宅|開始  -->
+                <Rectangle
+                    Grid.Column="3"
+                    Width="1"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Stretch"
+                    Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
                 <TextBlock
                     Grid.Column="4"
+                    HorizontalAlignment="Stretch"
                     FontWeight="SemiBold"
                     Style="{StaticResource CaptionTextBlockStyle}"
-                    Text="体調" />
+                    Text="開始"
+                    TextAlignment="Center" />
                 <TextBlock
                     Grid.Column="5"
+                    HorizontalAlignment="Stretch"
                     FontWeight="SemiBold"
                     Style="{StaticResource CaptionTextBlockStyle}"
-                    Text="終了" />
+                    Text="体調"
+                    TextAlignment="Center" />
+                <!--  縦区切り線：体調|終了  -->
+                <Rectangle
+                    Grid.Column="5"
+                    Width="1"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Stretch"
+                    Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
                 <TextBlock
                     Grid.Column="6"
+                    HorizontalAlignment="Stretch"
                     FontWeight="SemiBold"
                     Style="{StaticResource CaptionTextBlockStyle}"
-                    Text="達成状況" />
+                    Text="終了"
+                    TextAlignment="Center" />
                 <TextBlock
                     Grid.Column="7"
+                    HorizontalAlignment="Stretch"
                     FontWeight="SemiBold"
                     Style="{StaticResource CaptionTextBlockStyle}"
-                    Text="コメント" />
+                    Text="達成状況"
+                    TextAlignment="Center" />
+                <!--  縦区切り線：達成状況|コメント  -->
+                <Rectangle
+                    Grid.Column="7"
+                    Width="1"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Stretch"
+                    Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                <TextBlock
+                    Grid.Column="8"
+                    HorizontalAlignment="Stretch"
+                    FontWeight="SemiBold"
+                    Style="{StaticResource CaptionTextBlockStyle}"
+                    Text="コメント"
+                    TextAlignment="Center" />
             </Grid>
         </Border>
 
@@ -188,81 +247,139 @@
             </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="models:AttendanceLogEntry">
-                    <Grid ColumnSpacing="0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="100" />
-                            <ColumnDefinition Width="100" />
-                            <ColumnDefinition Width="50" />
-                            <ColumnDefinition Width="60" />
-                            <ColumnDefinition Width="50" />
-                            <ColumnDefinition Width="60" />
-                            <ColumnDefinition Width="50" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock
-                            Grid.Column="0"
-                            VerticalAlignment="Center"
-                            Text="{x:Bind DateDisplay}"
-                            TextTrimming="CharacterEllipsis" />
-                        <TextBlock
-                            Grid.Column="1"
-                            VerticalAlignment="Center"
-                            Text="{x:Bind Name}"
-                            TextTrimming="CharacterEllipsis" />
-                        <!--  在宅？列：在宅のときのみ HOME アイコンを表示、出社のときは空欄  -->
-                        <FontIcon
-                            Grid.Column="2"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            FontSize="16"
-                            Glyph="&#xE80F;"
-                            Visibility="{x:Bind RemoteIconVisibility}" />
-                        <TextBlock
-                            Grid.Column="3"
-                            VerticalAlignment="Center"
-                            Text="{x:Bind ClockIn}"
-                            TextTrimming="CharacterEllipsis" />
-
-                        <!--  体調列：ステータスに合わせた背景色の丸角Borderの中に顔絵文字を表示  -->
-                        <Border
-                            Grid.Column="4"
-                            Padding="6,2"
-                            HorizontalAlignment="Left"
-                            VerticalAlignment="Center"
-                            Background="{x:Bind ClockInStatusBackground}"
-                            CornerRadius="12">
+                    <!--  行全体を Border で囲み、下辺に横区切り線を入れる  -->
+                    <Border BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+                            BorderThickness="0,0,0,1">
+                        <Grid ColumnSpacing="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="40"/>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition Width="60"/>
+                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition Width="60"/>
+                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
                             <TextBlock
-                                FontSize="15"
-                                Text="{x:Bind ClockInStatusEmoji}"
-                                TextAlignment="Center" />
-                        </Border>
-
-                        <TextBlock
-                            Grid.Column="5"
-                            VerticalAlignment="Center"
-                            Text="{x:Bind ClockOut}"
-                            TextTrimming="CharacterEllipsis" />
-
-                        <!--  負荷列：ステータスに合わせた背景色の丸角Borderの中に顔絵文字を表示  -->
-                        <Border
-                            Grid.Column="6"
-                            Padding="6,2"
-                            HorizontalAlignment="Left"
-                            VerticalAlignment="Center"
-                            Background="{x:Bind ClockOutStatusBackground}"
-                            CornerRadius="12">
+                                Grid.Column="0"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Center"
+                                Text="{x:Bind DateDisplay}"
+                                TextAlignment="Center"
+                                TextTrimming="CharacterEllipsis" />
+                            <!--  曜日列：Date から算出した (日)〜(土) を表示  -->
                             <TextBlock
-                                FontSize="15"
-                                Text="{x:Bind ClockOutStatusEmoji}"
-                                TextAlignment="Center" />
-                        </Border>
+                                Grid.Column="1"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Center"
+                                Text="{x:Bind DayOfWeekDisplay}"
+                                TextAlignment="Center"
+                                TextTrimming="CharacterEllipsis" />
+                            <!--  縦区切り線：曜日|氏名  -->
+                            <Rectangle
+                                Grid.Column="1"
+                                Width="1"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Stretch"
+                                Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                            <TextBlock
+                                Grid.Column="2"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Center"
+                                Text="{x:Bind Name}"
+                                TextAlignment="Center"
+                                TextTrimming="CharacterEllipsis" />
+                            <!--  縦区切り線：氏名|在宅  -->
+                            <Rectangle
+                                Grid.Column="2"
+                                Width="1"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Stretch"
+                                Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                            <!--  在宅？列：在宅のときのみ HOME アイコンを表示、出社のときは空欄  -->
+                            <FontIcon
+                                Grid.Column="3"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                FontSize="16"
+                                Glyph="&#xE80F;"
+                                Visibility="{x:Bind RemoteIconVisibility}" />
+                            <!--  縦区切り線：在宅|開始  -->
+                            <Rectangle
+                                Grid.Column="3"
+                                Width="1"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Stretch"
+                                Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                            <TextBlock
+                                Grid.Column="4"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Center"
+                                Text="{x:Bind ClockIn}"
+                                TextAlignment="Center"
+                                TextTrimming="CharacterEllipsis" />
 
-                        <TextBlock
-                            Grid.Column="7"
-                            VerticalAlignment="Center"
-                            Text="{x:Bind Comment}"
-                            TextTrimming="CharacterEllipsis" />
-                    </Grid>
+                            <!--  体調列：ステータスに合わせた背景色の丸角Borderの中に顔絵文字を表示  -->
+                            <Border
+                                Grid.Column="5"
+                                Padding="6,2"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Background="{x:Bind ClockInStatusBackground}"
+                                CornerRadius="12">
+                                <TextBlock
+                                    FontSize="15"
+                                    Text="{x:Bind ClockInStatusEmoji}"
+                                    TextAlignment="Center" />
+                            </Border>
+                            <!--  縦区切り線：体調|終了  -->
+                            <Rectangle
+                                Grid.Column="5"
+                                Width="1"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Stretch"
+                                Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+
+                            <TextBlock
+                                Grid.Column="6"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Center"
+                                Text="{x:Bind ClockOut}"
+                                TextAlignment="Center"
+                                TextTrimming="CharacterEllipsis" />
+
+                            <!--  負荷列：ステータスに合わせた背景色の丸角Borderの中に顔絵文字を表示  -->
+                            <Border
+                                Grid.Column="7"
+                                Padding="6,2"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Background="{x:Bind ClockOutStatusBackground}"
+                                CornerRadius="12">
+                                <TextBlock
+                                    FontSize="15"
+                                    Text="{x:Bind ClockOutStatusEmoji}"
+                                    TextAlignment="Center" />
+                            </Border>
+                            <!--  縦区切り線：達成状況|コメント  -->
+                            <Rectangle
+                                Grid.Column="7"
+                                Width="1"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Stretch"
+                                Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+
+                            <TextBlock
+                                Grid.Column="8"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Text="{x:Bind Comment}"
+                                TextAlignment="Center"
+                                TextTrimming="CharacterEllipsis" />
+                        </Grid>
+                    </Border>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>

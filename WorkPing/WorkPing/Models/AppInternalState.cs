@@ -12,10 +12,11 @@ public class AppInternalState
     // ===========================
 
     /// <summary>
-    /// デフォルトで使用するログファイルパスのインデックス（0 始まり）。
-    /// ヘッダーのコンボボックスで選択した値が保存される。
+    /// メインのログファイルパスのインデックス（0 始まり）。
+    /// 自分の出退勤ログの書き込み先として使用する。
+    /// アカウント設定画面で設定し、コンボボックスの操作では変わらない。
     /// </summary>
-    public int DefaultLogFileIndex { get; set; } = 0;
+    public int MainLogFileIndex { get; set; } = 0;
 
     // ===========================
     // 最終ログ日付
@@ -59,7 +60,7 @@ public class AppInternalState
 
     /// <summary>
     /// 当日分のデータ（Today 系フィールドと HasPendingWrite）をリセットする。
-    /// LastLogDate と DefaultLogFileIndex はリセット対象外。
+    /// LastLogDate と MainLogFileIndex はリセット対象外。
     /// ツール起動時に日付が変わっていた場合に SettingsService から呼ばれる。
     /// </summary>
     public void ResetDailyData()

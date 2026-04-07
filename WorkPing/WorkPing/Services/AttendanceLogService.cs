@@ -37,7 +37,7 @@ public class AttendanceLogService
     /// <param name="entry">書き込む出退勤エントリー</param>
     /// <param name="filePath">
     ///   書き込み先の XML ファイルパス。
-    ///   null の場合は現在の設定（DefaultLogFileIndex）から取得する。
+    ///   null の場合は現在の設定（MainLogFileIndex）から取得する。
     /// </param>
     public async Task WriteEntryAsync(AttendanceEntry entry, string? filePath = null)
     {
@@ -49,21 +49,16 @@ public class AttendanceLogService
 
         await Task.Run(() =>
         {
-            // ファイルが存在しない場合は Root エレメントのみの XML を新規作成する
-            XDocument doc;
+            // ファイルが存在しない場合は書き込みを行わない（自動作成しない）
+            // ファイルの新規作成はアカウント設定画面の「新規作成」ボタンから明示的に行う
             if (!File.Exists(targetPath))
             {
-                var dir = Path.GetDirectoryName(targetPath);
-                if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
-                {
-                    Directory.CreateDirectory(dir);
-                }
-                doc = new XDocument(new XDeclaration("1.0", "utf-8", null), new XElement("Root"));
+                throw new FileNotFoundException(
+                    $"ログファイルが見つかりません。アカウント設定でパスを確認してください。\n{targetPath}",
+                    targetPath);
             }
-            else
-            {
-                doc = XDocument.Load(targetPath);
-            }
+
+            var doc = XDocument.Load(targetPath);
 
             var root = doc.Root!;
 

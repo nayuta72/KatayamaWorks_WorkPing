@@ -138,11 +138,11 @@
                 </Grid>
             </Border>
 
-            <!-- デフォルトログファイル選択 -->
+            <!-- メインログファイル選択 -->
             <StackPanel Spacing="4">
-                <TextBlock Text="デフォルトのログファイル（起動時に選択される）"
+                <TextBlock Text="メインのログファイル（自分のログの書き込み先）"
                            Style="{StaticResource CaptionTextBlockStyle}" />
-                <ComboBox SelectedIndex="{x:Bind ViewModel.DefaultLogFileIndex.Value, Mode=TwoWay}"
+                <ComboBox SelectedIndex="{x:Bind ViewModel.MainLogFileIndex.Value, Mode=TwoWay}"
                           MinWidth="200">
                     <ComboBoxItem Content="パス 1" />
                     <ComboBoxItem Content="パス 2" />

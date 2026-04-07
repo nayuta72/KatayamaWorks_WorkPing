@@ -19,6 +19,7 @@ public partial class AccountSettingsViewModel : IDisposable
     // 依存するサービスとモデル
     // ===========================
     private readonly SettingsService _settingsService;
+    private readonly AccessCheckService _accessCheckService;
     private readonly AccountSettingsModel _model;
 
     /// <summary>
@@ -27,10 +28,12 @@ public partial class AccountSettingsViewModel : IDisposable
     /// </summary>
     public CompositeDisposable Disposable { get; } = new();
 
-    public AccountSettingsViewModel(SettingsService settingsService)
+    public AccountSettingsViewModel(SettingsService settingsService,
+                                    AccessCheckService accessCheckService)
     {
-        _settingsService = settingsService;
-        _model           = new AccountSettingsModel();
+        _settingsService    = settingsService;
+        _accessCheckService = accessCheckService;
+        _model              = new AccountSettingsModel();
 
         // プロパティとコマンドを初期化する（各 partial ファイルの Initialize メソッドを呼ぶ）
         InitializeProperties();
@@ -60,7 +63,7 @@ public partial class AccountSettingsViewModel : IDisposable
                 : string.Empty;
         }
 
-        DefaultLogFileIndex.Value = s.InternalState.DefaultLogFileIndex;
+        MainLogFileIndex.Value = s.InternalState.MainLogFileIndex;
     }
 
     public void Dispose()

@@ -245,7 +245,7 @@ public sealed partial class ShortcutPage : Page
         };
         var nameBox0 = new TextBlock
         {
-            Text = "名前",
+            Text = "表示名",
             Width = 50
         };
         var nameBox1 = new TextBox
@@ -287,7 +287,12 @@ public sealed partial class ShortcutPage : Page
             picker.SuggestedStartLocation = PickerLocationId.ComputerFolder;
             picker.FileTypeFilter.Add("*");
             var file = await picker.PickSingleFileAsync();
-            if (file != null) linkBox1.Text = file.Path;
+            if (file != null)
+            {
+                linkBox1.Text = file.Path;
+                // 拡張子なしのファイル名を名前欄に自動入力する
+                nameBox1.Text = System.IO.Path.GetFileNameWithoutExtension(file.Path);
+            }
         };
 
         folderButton.Click += async (_, _) =>
@@ -298,7 +303,13 @@ public sealed partial class ShortcutPage : Page
             picker.SuggestedStartLocation = PickerLocationId.ComputerFolder;
             picker.FileTypeFilter.Add("*");
             var folder = await picker.PickSingleFolderAsync();
-            if (folder != null) linkBox1.Text = folder.Path;
+            if (folder != null)
+            {
+                linkBox1.Text = folder.Path;
+                // フォルダ名を名前欄に自動入力する
+                nameBox1.Text = System.IO.Path.GetFileName(folder.Path)
+                             ?? folder.DisplayName;
+            }
         };
 
         var browsePanel = new StackPanel
@@ -315,9 +326,9 @@ public sealed partial class ShortcutPage : Page
             Spacing  = 4,
             MinWidth = 400
         };
-        panel.Children.Add(nameBox);
         panel.Children.Add(linkBox);
         panel.Children.Add(browsePanel);
+        panel.Children.Add(nameBox);
         panel.Children.Add(new TextBlock
         {
             Text      = "URL を入力する場合は参照ボタンは使用せず直接入力してください。",

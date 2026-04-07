@@ -144,16 +144,20 @@ public static class StatusIconService
         int size = IconSize - margin * 2;
         int r    = CornerRadius * 2; // AddArc の幅・高さはコーナー円の直径
 
+        // 角丸四角のパスを時計回りで描く。
+        // AddArc の角度: 0°=右, 90°=下, 180°=左, 270°=上（GDI+ は時計回り）
+        // 各コーナーの弧は「内側に曲がる」向きになるよう、
+        // 矩形の外から内に向かう開始角度を選ぶ。
         using var path = new GraphicsPath();
-        // 左上の角弧（270° から 90° の範囲）
-        path.AddArc(margin,              margin,              r, r, 270, 90);
-        // 右上の角弧（0° から 90° の範囲）
-        path.AddArc(margin + size - r,   margin,              r, r,   0, 90);
-        // 右下の角弧（90° から 90° の範囲）
-        path.AddArc(margin + size - r,   margin + size - r,   r, r,  90, 90);
-        // 左下の角弧（180° から 90° の範囲）
-        path.AddArc(margin,              margin + size - r,   r, r, 180, 90);
-        path.CloseFigure(); // パスを閉じて四角形を完成させる
+        // 左上の角弧（180° から 90°：左辺 → 上辺 の方向）
+        path.AddArc(margin,              margin,              r, r, 180, 90);
+        // 右上の角弧（270° から 90°：上辺 → 右辺 の方向）
+        path.AddArc(margin + size - r,   margin,              r, r, 270, 90);
+        // 右下の角弧（0° から 90°：右辺 → 下辺 の方向）
+        path.AddArc(margin + size - r,   margin + size - r,   r, r,   0, 90);
+        // 左下の角弧（90° から 90°：下辺 → 左辺 の方向）
+        path.AddArc(margin,              margin + size - r,   r, r,  90, 90);
+        path.CloseFigure(); // パスを閉じて左辺を描いて四角形を完成させる
 
         using var bgBrush = new SolidBrush(bgColor);
         g.FillPath(bgBrush, path);

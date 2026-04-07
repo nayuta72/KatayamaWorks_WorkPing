@@ -60,9 +60,9 @@ public partial class AccountSettingsViewModel
                 LogFilePaths.Select(lp => lp.ToModel())
             );
 
-            // デフォルトインデックスが有効範囲内かを確認する
-            settings.InternalState.DefaultLogFileIndex = settings.LogFilePaths.Count > 0
-                ? Math.Clamp(DefaultLogFileIndex.Value, 0, settings.LogFilePaths.Count - 1)
+            // メインインデックスが有効範囲内かを確認する
+            settings.InternalState.MainLogFileIndex = settings.LogFilePaths.Count > 0
+                ? Math.Clamp(MainLogFileIndex.Value, 0, settings.LogFilePaths.Count - 1)
                 : 0;
 
             // settings.json に書き込む
@@ -71,6 +71,10 @@ public partial class AccountSettingsViewModel
             // FileWatcherService など Settings を購読しているサービスに変更を通知する。
             // IsAdmin の変更をリアルタイムで反映させるために必要（再起動不要にするため）。
             _settingsService.NotifySettingsChanged();
+
+            // ログファイルパスが変わった可能性があるため、即時アクセスチェックを実行する。
+            // これにより 5 分待たずにエラーアイコンの表示を更新できる。
+            await _accessCheckService.CheckNowAsync();
 
             System.Diagnostics.Debug.WriteLine("[AccountSettingsViewModel] 設定を保存しました。");
         }

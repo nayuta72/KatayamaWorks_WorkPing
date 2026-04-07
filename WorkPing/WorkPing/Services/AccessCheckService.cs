@@ -21,11 +21,20 @@ public class AccessCheckService : IDisposable
     private readonly AttendanceLogService _attendanceLogService;
 
     /// <summary>
-    /// ファイルへのアクセス可否を表すリアクティブプロパティ。
+    /// 現在選択中のファイルへのアクセス可否を表すリアクティブプロパティ。
     /// true = アクセス可能、false = アクセス不可。
-    /// MainWindow がこれを購読して警告アイコンの表示を切り替える。
+    /// 書き込みキュー（EnqueueWriteAsync）の即時書き込み判定に使用する。
     /// </summary>
     public ReactivePropertySlim<bool> IsFileAccessible { get; } = new(true);
+
+    /// <summary>
+    /// アクセスできないファイルの表示名（拡張子なしファイル名）リスト。
+    /// 登録されているすべてのファイルを確認し、アクセス不可のものを列挙する。
+    /// MainWindow がこれを購読してタイトルバーの警告アイコンとファイル名を表示する。
+    /// 空リストの場合はすべてのファイルにアクセス可能。
+    /// </summary>
+    public ReactivePropertySlim<IReadOnlyList<string>> InaccessibleFileNames { get; }
+        = new(Array.Empty<string>());
 
     // アクセス不可時に書き込みを一時的に溜めるキュー（同一セッション内での保留に使用）
     // アプリ再起動後の保留は settings.json の HasPendingWrite フラグで管理する
@@ -96,8 +105,28 @@ public class AccessCheckService : IDisposable
     /// </summary>
     private async Task CheckAndFlushAsync()
     {
-        var currentPath = _settingsService.Settings.Value.CurrentLogFilePath?.FilePath;
+        var settings    = _settingsService.Settings.Value;
+        var currentPath = settings.CurrentLogFilePath?.FilePath;
 
+        // ─── 全登録ファイルのアクセス確認 ────────────────────────────────────
+        // 登録されているすべての有効なパスを確認し、アクセス不可のファイル名を収集する
+        var inaccessibleNames = new List<string>();
+        foreach (var logFilePath in settings.LogFilePaths)
+        {
+            var path = logFilePath.FilePath;
+            if (string.IsNullOrWhiteSpace(path)) continue;
+
+            if (!CheckFileAccess(path))
+            {
+                // 表示名（拡張子なしファイル名）を収集する
+                inaccessibleNames.Add(Path.GetFileNameWithoutExtension(path));
+            }
+        }
+
+        // アクセス不可ファイル名リストを更新する（変化があった場合のみ通知）
+        InaccessibleFileNames.Value = inaccessibleNames;
+
+        // ─── 選択中ファイルのアクセス状態を更新（書き込みキュー用） ─────────
         // ログパスが設定されていない場合はチェックをスキップする
         if (string.IsNullOrWhiteSpace(currentPath))
         {
@@ -105,7 +134,8 @@ public class AccessCheckService : IDisposable
             return;
         }
 
-        var isAccessible = CheckFileAccess(currentPath);
+        var isAccessible = !inaccessibleNames.Contains(
+            Path.GetFileNameWithoutExtension(currentPath));
         IsFileAccessible.Value = isAccessible;
 
         // アクセス不可の場合は何もしない
@@ -114,7 +144,6 @@ public class AccessCheckService : IDisposable
         // ─── 再起動後の保留復元 ──────────────────────────────────────────────
         // キューが空でも HasPendingWrite フラグが立っている場合、
         // settings.json から最新の出退勤データを復元してキューに積む
-        var settings = _settingsService.Settings.Value;
         if (settings.InternalState.HasPendingWrite && _pendingEntries.Count == 0)
         {
             var restored = ReconstructEntryFromSettings(settings);
@@ -240,8 +269,9 @@ public class AccessCheckService : IDisposable
             // ディレクトリが存在しない場合はアクセス不可
             if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir)) return false;
 
-            // ファイルが存在しない場合は新規作成できると判断（アクセス可能）
-            if (!File.Exists(filePath)) return true;
+            // ファイルが存在しない場合はアクセス不可と判断する
+            // （自動作成はしない。ファイルはアカウント設定の「新規作成」ボタンで明示的に作成する）
+            if (!File.Exists(filePath)) return false;
 
             // 実際にファイルを開いて書き込み可否を確認する
             using var fs = File.Open(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite);
@@ -253,9 +283,16 @@ public class AccessCheckService : IDisposable
         }
     }
 
+    /// <summary>
+    /// 即時アクセスチェックを実行する。
+    /// 設定保存など、5分待たずにすぐ結果を反映したい場合に呼び出す。
+    /// </summary>
+    public async Task CheckNowAsync() => await CheckAndFlushAsync();
+
     public void Dispose()
     {
         _checkTimer?.Dispose();
         IsFileAccessible.Dispose();
+        InaccessibleFileNames.Dispose();
     }
 }

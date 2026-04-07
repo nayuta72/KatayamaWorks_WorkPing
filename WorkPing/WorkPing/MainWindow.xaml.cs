@@ -213,23 +213,25 @@ public sealed partial class MainWindow : Window
     /// </summary>
     private void InitializeLogFileComboBox()
     {
-        var settings = _settingsService.Settings.Value;
+        var settings      = _settingsService.Settings.Value;
+        var mainIndex     = settings.InternalState.MainLogFileIndex;
         LogFileComboBox.Items.Clear();
 
         // パスが2件以上あるときのみコンボボックスを表示する
         // （1件以下の場合は選択肢がないため非表示にする）
         if (settings.LogFilePaths.Count >= 2)
         {
-            foreach (var logPath in settings.LogFilePaths)
+            for (var i = 0; i < settings.LogFilePaths.Count; i++)
             {
+                var logPath   = settings.LogFilePaths[i];
+                // メインファイルかどうかをフラグにセットする（★表示の制御に使用）
+                logPath.IsMain = (i == mainIndex);
                 LogFileComboBox.Items.Add(logPath);
             }
 
-            // デフォルトのインデックスを選択する
+            // 起動時はメインファイルを選択状態にする
             LogFileComboBox.SelectedIndex =
-                settings.InternalState.DefaultLogFileIndex < LogFileComboBox.Items.Count
-                    ? settings.InternalState.DefaultLogFileIndex
-                    : 0;
+                mainIndex < LogFileComboBox.Items.Count ? mainIndex : 0;
 
             LogFileComboBox.Visibility = Visibility.Visible;
         }
@@ -238,6 +240,7 @@ public sealed partial class MainWindow : Window
             // パスが0または1件のとき：コンボボックスを非表示にする
             if (settings.LogFilePaths.Count == 1)
             {
+                settings.LogFilePaths[0].IsMain = true;
                 LogFileComboBox.Items.Add(settings.LogFilePaths[0]);
                 LogFileComboBox.SelectedIndex = 0;
             }
@@ -245,21 +248,19 @@ public sealed partial class MainWindow : Window
         }
 
         // ログ一覧ボタンは管理者のみ表示する
-        LogViewerSplitButton.Visibility = settings.IsAdmin
+        LogViewerDropDownButton.Visibility = settings.IsAdmin
             ? Visibility.Visible
             : Visibility.Collapsed;
     }
 
     /// <summary>
-    /// コンボボックスで選択されたログファイルを settings に反映する。
+    /// コンボボックスで選択されたログファイルが変わっても設定は保存しない。
+    /// コンボの選択はどのファイルを閲覧・監視するかの UI 状態であり、
+    /// ログの書き込み先（メインファイル）はアカウント設定で管理する。
     /// </summary>
-    private async void LogFileComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void LogFileComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (LogFileComboBox.SelectedIndex < 0) return;
-
-        // 選択されたインデックスを設定として保存する
-        _settingsService.Settings.Value.InternalState.DefaultLogFileIndex = LogFileComboBox.SelectedIndex;
-        await _settingsService.SaveSettingsAsync();
+        // 選択変更では settings を更新しない（意図的な空ハンドラ）
     }
 
     // ===========================
@@ -267,18 +268,27 @@ public sealed partial class MainWindow : Window
     // ===========================
 
     /// <summary>
-    /// ファイルアクセス可否の変化を購読し、タイトルバーのアイコン表示を切り替える。
+    /// アクセス不可ファイル名リストの変化を購読し、タイトルバーの警告表示を更新する。
+    /// リストが空 = すべてアクセス可能 → パネルを非表示
+    /// リストに1件以上 = アクセス不可あり → パネルを表示してファイル名を並べる
     /// </summary>
     private void SubscribeAccessStatus()
     {
-        _accessCheckService.IsFileAccessible.Subscribe(isAccessible =>
+        _accessCheckService.InaccessibleFileNames.Subscribe(names =>
         {
             // UIスレッドで実行する（購読はバックグラウンドスレッドから呼ばれる可能性がある）
             DispatcherQueue.TryEnqueue(() =>
             {
-                AccessWarningPanel.Visibility = isAccessible
-                    ? Visibility.Collapsed
-                    : Visibility.Visible;
+                if (names.Count == 0)
+                {
+                    AccessWarningPanel.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    // アクセス不可のファイル名をカンマ区切りで表示する（例: "Log2025, Log2024_B"）
+                    AccessWarningFileNames.Text   = string.Join(", ", names);
+                    AccessWarningPanel.Visibility = Visibility.Visible;
+                }
             });
         });
     }
@@ -402,25 +412,33 @@ public sealed partial class MainWindow : Window
     }
 
     // ===========================
-    // 勤怠ログ一覧ウィンドウ（SplitButton）
+    // 勤怠ログ一覧ウィンドウ（DropDownButton）
     // ===========================
 
     /// <summary>
-    /// SplitButton の左クリック：ログ一覧ウィンドウを開く（または前面に出す）。
-    /// ウィンドウがすでに開いている場合は Activate() で前面に持ってくる。
+    /// DropDownButton のメニューアイテムクリック：日付範囲を変更してウィンドウを開く。
+    /// ウィンドウがすでに開いている場合は日付範囲を更新して前面に出す。
+    /// ウィンドウが閉じている場合は新規作成して開く。
     /// </summary>
-    private async void LogViewerSplitButton_Click(SplitButton sender, SplitButtonClickEventArgs e)
+    private async void LogViewerRange_Click(object sender, RoutedEventArgs e)
     {
+        if (sender is not MenuFlyoutItem item) return;
+        var range = item.Tag?.ToString() ?? "Today";
+
+        // 日付範囲をボタンラベルとフィールドに反映する
+        _logViewerDateRange = range;
+        LogViewerRangeLabel.Text = range;
+
         // 現在選択中のログファイルパスを取得する
         var filePath = _settingsService.Settings.Value.CurrentLogFilePath?.FilePath;
         if (string.IsNullOrEmpty(filePath))
         {
             var dialog = new ContentDialog
             {
-                Title         = "ログファイル未設定",
-                Content       = "ログファイルが設定されていません。\nアカウント設定でパスを登録してください。",
+                Title           = "ログファイル未設定",
+                Content         = "ログファイルが設定されていません。\nアカウント設定でパスを登録してください。",
                 CloseButtonText = "閉じる",
-                XamlRoot      = Content.XamlRoot
+                XamlRoot        = Content.XamlRoot
             };
             await dialog.ShowAsync();
             return;
@@ -432,29 +450,14 @@ public sealed partial class MainWindow : Window
             _logViewerWindow = new AttendanceLogViewerWindow();
             _logViewerWindow.Closed += (s, _) => _logViewerWindow = null;
             _logViewerWindow.Activate();
-            await _logViewerWindow.LoadAsync(filePath, _logViewerDateRange);
+            await _logViewerWindow.LoadAsync(filePath, range);
         }
         else
         {
-            // すでに開いているので前面に出す
+            // すでに開いているので日付範囲を更新して前面に出す
+            _logViewerWindow.ChangeDateRange(range);
             _logViewerWindow.Activate();
         }
-    }
-
-    /// <summary>
-    /// SplitButton ドロップダウンのアイテムクリック：日付範囲を変更する。
-    /// ウィンドウが開いていれば即時フィルタを更新する。
-    /// </summary>
-    private void LogViewerRange_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is not MenuFlyoutItem item) return;
-        var range = item.Tag?.ToString() ?? "Today";
-
-        _logViewerDateRange = range;
-        LogViewerRangeLabel.Text = range;
-
-        // ウィンドウが開いていれば日付範囲をリアルタイムで更新する
-        _logViewerWindow?.ChangeDateRange(range);
     }
 
     // ===========================

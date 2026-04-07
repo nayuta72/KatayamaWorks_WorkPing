@@ -108,7 +108,7 @@ public class SettingsService
     /// <summary>
     /// LastLogDate が今日でない場合に InternalState の当日データをリセットして保存する。
     /// アプリ起動時に LoadSettingsAsync から呼ばれる。
-    /// リセット対象: Today 系フィールドと HasPendingWrite（DefaultLogFileIndex と LastLogDate はそのまま）。
+    /// リセット対象: Today 系フィールドと HasPendingWrite（MainLogFileIndex と LastLogDate はそのまま）。
     /// </summary>
     private async Task ResetDailyDataIfDateChangedAsync()
     {
