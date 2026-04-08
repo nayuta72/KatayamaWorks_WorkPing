@@ -60,7 +60,7 @@ public partial class ShortcutViewModel
     /// </summary>
     private async Task SaveAsync()
     {
-        _settingsService.Settings.Value.Shortcuts = Shortcuts.ToList();
+        _settingsService.Settings.Value.Shortcuts2 = Shortcuts.ToList();
         await _settingsService.SaveSettingsAsync();
     }
 }

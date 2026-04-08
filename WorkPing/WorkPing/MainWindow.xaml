@@ -127,7 +127,10 @@
         <!-- ============================= -->
         <!-- メインコンテンツ：NavigationView -->
         <!-- ============================= -->
+        <!--  PaneDisplayMode="LeftCompact" で常にアイコンのみのコンパクト表示に固定する。  -->
+        <!--  指定しないとウィンドウが広がったときにペインが自動展開し余白が生まれる。  -->
         <NavigationView IsPaneOpen="False" IsPaneToggleButtonVisible="False"
+            PaneDisplayMode="LeftCompact"
             x:Name="MainNavView"
             Grid.Row="1"
             IsBackButtonVisible="Collapsed"

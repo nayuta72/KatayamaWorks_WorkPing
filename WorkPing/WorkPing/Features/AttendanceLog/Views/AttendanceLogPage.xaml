@@ -231,30 +231,34 @@
             </Grid>
 
             <!--  =============================  -->
-            <!--  就業管理システム・M-Plusへのジャンプボタン  -->
+            <!--  ショートカットボタン（動的生成）  -->
+            <!--  コードビハインドで settings.json の Shortcuts1 から  -->
+            <!--  ボタンを動的に生成して挿入する。   -->
+            <!--  「追加」ボタンは常に末尾に固定。   -->
             <!--  =============================  -->
-
             <Border
                 Margin="2"
-                Padding="16"
+                Padding="8"
                 Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                 BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                 BorderThickness="1"
                 CornerRadius="8">
-                <StackPanel Orientation="Horizontal">
-                    <Button
-                        Margin="0,0,10,0"
-                        Click="WorktimeSystemButton_Click"
-                        Content="就業管理システム" />
-                    <Button
-                        Margin="0,0,10,0"
-                        Click="MPlusButton_Click"
-                        Content="M-Plus" />
-                    <Button
-                        Margin="0,0,10,0"
-                        Click="ProductionSystemButton_Click"
-                        Content="生産管理システム" />
-                </StackPanel>
+                <!--  ボタンが増えて横幅を超えたときに横スクロールできるようにする  -->
+                <ScrollViewer HorizontalScrollMode="Auto"
+                              HorizontalScrollBarVisibility="Auto"
+                              VerticalScrollMode="Disabled"
+                              VerticalScrollBarVisibility="Hidden">
+                    <!--  ボタンを横一列に並べる。「追加」ボタンは常に末尾に固定  -->
+                    <StackPanel x:Name="AttendanceShortcutPanel"
+                                Orientation="Horizontal">
+                        <Button Margin="4"
+                                Opacity="0.5"
+                                Click="AddShortcut1Button_Click"
+                                ToolTipService.ToolTip="ショートカットを追加">
+                            <FontIcon FontSize="14" Glyph="&#xE710;" />
+                        </Button>
+                    </StackPanel>
+                </ScrollViewer>
             </Border>
             <!--  =============================  -->
             <!--  Windows ログイン時刻情報  -->

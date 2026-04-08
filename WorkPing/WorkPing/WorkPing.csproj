@@ -37,6 +37,23 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- MIT ライセンス条文をビルド出力の LICENSES フォルダにコピーする
+         使用している NuGet パッケージのライセンス同梱義務を満たすために必要 -->
+    <Content Include="LICENSES\Microsoft.WindowsAppSDK.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="LICENSES\Microsoft.Extensions.DependencyInjection.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="LICENSES\ReactiveProperty.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="LICENSES\System.Drawing.Common.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- Windows App SDK（WinUI 3 本体） -->
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.250205002" />
     <!-- WinUI 3 ビルドツール（MSBuild タスクが依存） -->

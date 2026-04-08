@@ -1,6 +1,8 @@
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
+using System.Collections.ObjectModel;
 using System.Reactive.Linq;
+using WorkPing.Models;
 
 namespace WorkPing.Features.AttendanceLog.ViewModels;
 
@@ -73,6 +75,16 @@ public partial class AttendanceLogViewModel
 
     /// <summary>退勤ボタン（悪い）が選択中かどうか</summary>
     public ReadOnlyReactivePropertySlim<bool> IsClockOutBad { get; private set; } = null!;
+
+    // ===========================
+    // 出退勤ページのショートカット（Shortcuts1）
+    // ===========================
+
+    /// <summary>
+    /// 出退勤ページに表示するショートカットボタンのコレクション。
+    /// settings.json の Shortcuts1 と同期する。
+    /// </summary>
+    public ObservableCollection<ShortcutItem> AttendanceShortcuts { get; } = new();
 
     /// <summary>プロパティを初期化する（コンストラクタから呼ばれる）。</summary>
     private void InitializeProperties()

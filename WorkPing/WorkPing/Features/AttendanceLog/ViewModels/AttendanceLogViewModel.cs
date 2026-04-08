@@ -174,6 +174,17 @@ public partial class AttendanceLogViewModel : IDisposable
         IsRemoteWork.Value = s.InternalState.TodayWorkType == AttendanceLogModel.WorkTypeRemote;
     }
 
+    /// <summary>
+    /// settings.json の Shortcuts1 をコレクションに読み込む。
+    /// ページが表示されるたびに呼ぶことでリストを最新状態に保つ。
+    /// </summary>
+    public void LoadShortcuts1FromSettings()
+    {
+        AttendanceShortcuts.Clear();
+        foreach (var item in _settingsService.Settings.Value.Shortcuts1)
+            AttendanceShortcuts.Add(item);
+    }
+
     public void Dispose()
     {
         Disposable.Dispose();

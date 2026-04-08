@@ -1,7 +1,7 @@
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using WorkPing.Features.AttendanceLog.Models;
-using WorkPing.Models; // AttendanceEntry, AttendanceAction
+using WorkPing.Models;
 
 namespace WorkPing.Features.AttendanceLog.ViewModels;
 
@@ -161,6 +161,40 @@ public partial class AttendanceLogViewModel
         entry.Action = AttendanceAction.Comment;
 
         await _accessCheckService.EnqueueWriteAsync(entry);
+    }
+
+    // ===========================
+    // 出退勤ページのショートカット CRUD（Shortcuts1）
+    // ===========================
+
+    /// <summary>ショートカットを追加して settings.json に保存する。</summary>
+    public async Task AddShortcut1Async(string name, string link)
+    {
+        var item = new ShortcutItem { Name = name.Trim(), Link = link.Trim() };
+        AttendanceShortcuts.Add(item);
+        await SaveShortcuts1Async();
+    }
+
+    /// <summary>既存ショートカットの名前・リンク先を更新して settings.json に保存する。</summary>
+    public async Task UpdateShortcut1Async(ShortcutItem item, string newName, string newLink)
+    {
+        item.Name = newName.Trim();
+        item.Link = newLink.Trim();
+        await SaveShortcuts1Async();
+    }
+
+    /// <summary>ショートカットを削除して settings.json に保存する。</summary>
+    public async Task DeleteShortcut1Async(ShortcutItem item)
+    {
+        AttendanceShortcuts.Remove(item);
+        await SaveShortcuts1Async();
+    }
+
+    /// <summary>現在のコレクション内容を settings.json の Shortcuts1 に書き込む。</summary>
+    private async Task SaveShortcuts1Async()
+    {
+        _settingsService.Settings.Value.Shortcuts1 = AttendanceShortcuts.ToList();
+        await _settingsService.SaveSettingsAsync();
     }
 
     /// <summary>

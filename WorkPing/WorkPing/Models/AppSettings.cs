@@ -40,10 +40,16 @@ public class AppSettings
     // ===========================
 
     /// <summary>
-    /// ショートカットボタンのリスト。
+    /// 出退勤ページのショートカットボタンリスト（Shortcuts1）。
+    /// 就業管理システムや M-Plus など業務システムへのリンクを登録する。
+    /// </summary>
+    public List<ShortcutItem> Shortcuts1 { get; set; } = new();
+
+    /// <summary>
+    /// ショートカットページのショートカットボタンリスト（Shortcuts2）。
     /// ファイルパス・フォルダパス・URL を登録でき、上限なしに追加可能。
     /// </summary>
-    public List<ShortcutItem> Shortcuts { get; set; } = new();
+    public List<ShortcutItem> Shortcuts2 { get; set; } = new();
 
     // ===========================
     // 内部状態データ

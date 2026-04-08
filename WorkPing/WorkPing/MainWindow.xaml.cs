@@ -57,7 +57,10 @@ public sealed partial class MainWindow : Window
         InitializeTitleBar();
         App.Trace("InitializeTitleBar OK");
 
-        SetWindowSize(870, 370);
+        // 論理ピクセル単位で指定する（96 DPI = 100% 基準）
+        // 内部で DPI スケールを掛けて物理ピクセルに変換するため、
+        // どの DPI 設定でも画面上の見た目のサイズが同じになる
+        SetWindowSize(800, 500);
         App.Trace("SetWindowSize OK");
 
         // 退勤ステータス未入力のときに閉じようとしたら確認ダイアログを表示する
@@ -126,9 +129,29 @@ public sealed partial class MainWindow : Window
     // ===========================
     // ウィンドウサイズ設定
     // ===========================
-    private void SetWindowSize(int width, int height)
+
+    // DPI 取得のための Win32 API（user32.dll）
+    // AppWindow.Resize は物理ピクセルで指定するため、論理ピクセルをDPIスケールで変換する必要がある
+    [DllImport("user32.dll")]
+    private static extern uint GetDpiForWindow(nint hwnd);
+
+    /// <summary>
+    /// 論理ピクセル単位でウィンドウサイズを設定する。
+    /// 内部で DPI スケールを取得し、物理ピクセルに変換して AppWindow.Resize に渡す。
+    /// これにより 100% / 125% / 150% / 200% など任意の DPI 設定でも
+    /// 画面上の見た目のサイズが一定になる。
+    /// </summary>
+    /// <param name="logicalWidth">論理ピクセル単位の幅（96 DPI 基準）</param>
+    /// <param name="logicalHeight">論理ピクセル単位の高さ（96 DPI 基準）</param>
+    private void SetWindowSize(int logicalWidth, int logicalHeight)
     {
-        GetAppWindow().Resize(new SizeInt32(width, height));
+        var hwnd  = WinRT.Interop.WindowNative.GetWindowHandle(this);
+        var dpi   = GetDpiForWindow(hwnd);
+        // 96 DPI = スケール 1.0 を基準とする（Windows の標準DPI基準値）
+        var scale = dpi / 96.0;
+        GetAppWindow().Resize(new SizeInt32(
+            (int)(logicalWidth  * scale),
+            (int)(logicalHeight * scale)));
     }
 
     /// <summary>このウィンドウに対応する AppWindow を返すヘルパー。</summary>

@@ -40,7 +40,7 @@ public partial class ShortcutViewModel : IDisposable
     public void LoadFromSettings()
     {
         Shortcuts.Clear();
-        foreach (var item in _settingsService.Settings.Value.Shortcuts)
+        foreach (var item in _settingsService.Settings.Value.Shortcuts2)
             Shortcuts.Add(item);
     }
 
