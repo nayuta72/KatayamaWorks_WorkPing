@@ -128,6 +128,11 @@ public static class StatusIconService
         var filePath = Path.Combine(IconDirectory, $"status_{status}.png");
 
         using var bitmap = new Bitmap(IconSize, IconSize, PixelFormat.Format32bppArgb);
+        // DPI メタデータを 96 DPI に固定する。
+        // トースト通知はシステム側が DIP で描画するため、PNG の DPI 情報が
+        // 異なる値になっていると拡大縮小の基準がずれる場合がある。
+        // モニターの DPI 設定に関わらず常に同じ見た目になるよう明示する。
+        bitmap.SetResolution(96, 96);
         using var g = Graphics.FromImage(bitmap);
 
         g.SmoothingMode     = SmoothingMode.AntiAlias;
